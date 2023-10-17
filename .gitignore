@@ -1,3 +1,7 @@
+# Workspace specific ignores
+streak/results/
+streak/guide/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

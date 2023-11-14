@@ -1,0 +1,169 @@
+default_megacomplex: decay
+dataset_groups:
+  streak:
+    residual_function: non_negative_least_squares
+    link_clp: True
+  default:
+    residual_function: variable_projection
+    link_clp: True
+
+dataset:
+  CF9212WLtr1:
+    group: streak
+    megacomplex: [CF9212complexWL,CF9212freeChla]
+    megacomplex_scale: [CF9212scalem.1,CF9212scalem.WLtr1a]
+    initial_concentration: CF9212inputWL
+    irf: CF9212irfWLtr1
+    scale: CF9212scale.WLtr1
+  CF9212WLtr2:
+    group: streak
+    megacomplex: [CF9212complexWL,CF9212freeChla]
+    megacomplex_scale: [CF9212scalem.1,CF9212scalem.WLtr2a]
+    initial_concentration: CF9212inputWL
+    irf: CF9212irfWLtr2
+    scale: CF9212scale.WLtr2
+  CF9212WLtr4:
+    group: streak
+    megacomplex: [CF9212complexWL,CF9212freeChla]
+    megacomplex_scale: [CF9212scalem.1,CF9212scalem.WLtr4a]
+    initial_concentration: CF9212inputWL
+    irf: CF9212irfWLtr4
+    scale: CF9212scale.WLtr4
+  WLRCSAS:
+    group: streak
+    megacomplex:
+    - smc4
+    scale: scale.WLRCSAS
+
+
+
+megacomplex:
+  CF9212freeChla:
+    k_matrix: [CF9212kmChla]
+  CF9212complexWL:
+    # k_matrix: [CF9212skmBulkWL,CF9212skmWLRC,CF9212skmWLRCtrap]
+    k_matrix: [CF9212skmBulkWL]
+  smc4:
+    dimension: time
+    target: CF9212WLRC
+    type: clp-guide
+# note that earlier definition will override later definition
+# xrates correction for different numbers of Bulk Chl a pigments in WL vs FRL (78 vs 70)
+k_matrix:
+  CF9212skmBulkWL:
+    matrix:
+      (CF9212Bulk, CF9212Red1): CF9212rates.ToBulkFromRed1
+      (CF9212Red1, CF9212Bulk): CF9212rates.ToRed1FromBulk
+      (CF9212Bulk, CF9212Red2): CF9212rates.ToBulkFromRed2
+      (CF9212Red2, CF9212Bulk): CF9212rates.ToRed2FromBulk
+      (CF9212Red1, CF9212Red1): CF9212rates.kF
+      (CF9212Red2, CF9212Red2): CF9212rates.kF
+  # CF9212skmWLRC:
+  #   matrix:
+      (CF9212WLRC, CF9212WLRP1): CF9212rates.ToWLRCFromWLRP1
+      (CF9212WLRP1, CF9212WLRC): CF9212rates.ToWLRP1FromWLRC
+      (CF9212Bulk, CF9212WLRC): CF9212rates.ToBulkFromWLRC
+      (CF9212WLRC, CF9212Bulk): CF9212rates.ToWLRCFromBulk
+  # CF9212skmWLRCtrap:
+  #   matrix:
+      (CF9212WLRP1, CF9212WLRP1): CF9212rates.WLRP1
+      (CF9212Bulk, CF9212Bulk): CF9212rates.kF
+  CF9212kmChla:
+    matrix:
+      (CF9212freeChla, CF9212freeChla): CF9212rates.kF
+
+initial_concentration:
+  CF9212inputWL:
+    compartments: [CF9212Bulk,CF9212Red1,CF9212Red2,CF9212WLRC,CF9212freeChla,CF9212WLRP1]
+    parameters: [input.Bulk,input.Red1, input.Red2, input.RC,input.1,input.0]
+    exclude_from_normalize: [CF9212freeChla]
+
+clp_penalties:
+  - type: equal_area
+    source: CF9212freeChla
+    source_intervals: [[0, 1000]]
+    target: CF9212Bulk
+    target_intervals: [[0, 1000]]
+    parameter: area.1
+    weight: 0.62e-2
+  - type: equal_area
+    source: CF9212Red2
+    source_intervals: [[0, 1000]]
+    target: CF9212Bulk
+    target_intervals: [[0, 1000]]
+    parameter: area.Bulk
+    weight: 0.62e-2
+  - type: equal_area
+    source: CF9212Red2
+    source_intervals: [[0, 1000]]
+    target: CF9212Red1
+    target_intervals: [[0, 1000]]
+    parameter: area.1
+    weight: 0.62e-2
+  - type: equal_area
+    source: CF9212Red2
+    source_intervals: [[0, 1000]]
+    target: CF9212WLRC
+    target_intervals: [[0, 1000]]
+    parameter: area.1
+    weight: 0.62e-2
+
+# clp_relations:
+#   - source: sWLRC
+#     target: CF9212WLRC
+#     parameter: rel.r1
+#     interval: [[0, 1000]]
+#   - source: sRed1
+#     target: CF9212Red1
+#     parameter: rel.r1
+#     interval: [[0, 1000]]
+#   - source: sRed2
+#     target: CF9212Red2
+#     parameter: rel.r1
+#     interval: [[0, 1000]]
+
+clp_constraints:
+  # - type: zero
+  #   target: CF9212Red2
+  #   interval:
+  #     - [100, 683]
+  - type: zero
+    target: CF9212WLRP1
+    interval:
+      - [100, 1000]
+      #
+
+# it is implicitly normalized, i.e. divided by sum of irfscale parameters
+irf:
+  CF9212irfWLtr1:
+    type: spectral-multi-gaussian
+    center: [CF9212irfWLtr1.center]
+    width: [CF9212irfWLtr1.width1,CF9212irfWLtr1.width2]
+    scale: [CF9212irfWLtr1.scale1,CF9212irfWLtr1.scale2]
+    backsweep: True
+    backsweep_period: irf.common_backsweep
+    dispersion_center: irf.dispcenter
+    center_dispersion_coefficients: [irf.disp1,irf.disp2]
+  CF9212irfWLtr2:
+    type: spectral-multi-gaussian
+    center: [CF9212irfWLtr2.center]
+    width: [CF9212irfWLtr2.width1,CF9212irfWLtr2.width2]
+    scale: [CF9212irfWLtr2.scale1,CF9212irfWLtr2.scale2]
+    backsweep: True
+    backsweep_period: irf.common_backsweep
+    dispersion_center: irf.dispcenter
+    center_dispersion_coefficients: [irf.disp1,irf.disp2]
+  CF9212irfWLtr4:
+    type: spectral-multi-gaussian
+    center: [CF9212irfWLtr4.center]
+    width: [CF9212irfWLtr4.width1,CF9212irfWLtr4.width2]
+    scale: [CF9212irfWLtr4.scale1,CF9212irfWLtr4.scale2]
+    backsweep: True
+    backsweep_period: irf.common_backsweep
+    dispersion_center: irf.dispcenter
+    center_dispersion_coefficients: [irf.disp1,irf.disp2]
+
+weights:
+  - datasets: [WLRCSAS]
+    global_interval: [100, 1000]
+    value: 0.1

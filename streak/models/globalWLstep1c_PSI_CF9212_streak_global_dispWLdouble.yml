@@ -88,11 +88,3 @@ irf:
     backsweep_period: irf.common_backsweep
     dispersion_center: irf.dispcenter
     center_dispersion_coefficients: [irf.disp1,irf.disp2]
-
-# weights:
-#   - datasets: [CF9212WLtr1,CF9212WLtr2]
-#     global_interval: [100, 1000]
-#     value: 0.5
-#   - datasets: [CF9212WLtr4]
-#     global_interval: [100, 1000]
-#     value: 0.2

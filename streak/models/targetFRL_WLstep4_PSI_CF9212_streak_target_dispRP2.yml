@@ -3,11 +3,9 @@ dataset_groups:
   streak:
     residual_function: non_negative_least_squares
     link_clp: True
-  default:
-    residual_function: variable_projection
-    link_clp: True
 
 dataset:
+# the 2nd and 3rd megacomplex_scale parameter differ to allow for free Chla and Chlf fractions per data set
   CF9212FRLtr1:
     group: streak
     megacomplex: [CF9212complexFRL,CF9212freeChla,CF9212freeChlf]
@@ -101,26 +99,13 @@ megacomplex:
     dimension: time
     target: CF9212WLRC
     type: clp-guide
-  # smc8:
-  #   dimension: time
-  #   target: sChlf1
-  #   type: clp-guide
-  # smc9:
-  # # streak_guide_Chlf2:
-  #   dimension: time
-  #   target: sChlf2
-  #   type: clp-guide
   smc10:
     dimension: time
     target: CF9212FRLRC
     type: clp-guide
-  # smc12:
-  #   dimension: time
-  #   target: CF9212freeChlf
-  #   type: clp-guide
 
 # note that earlier definition will override later definition
-# xrates correction for different numbers of Bulk Chl a pigments in WL vs FRL (78 vs 70)
+# xCF9212rates correction for different numbers of Bulk Chl a pigments in WL vs FRL (78 vs 70)
 k_matrix:
   CF9212skmBulkWL:
     matrix:
@@ -167,7 +152,6 @@ k_matrix:
       (CF9212FRLRC, CF9212Chlf1): CF9212rates.ToFRLRCFromChlf1
       (CF9212Chlf1, CF9212Chlf1): CF9212rates.kF
       (CF9212Chlf2, CF9212Chlf2): CF9212rates.kF
-# unique for streak
   CF9212skmFRLRCtrap:
     matrix:
       (CF9212FRLRP2, CF9212FRLRP1): CF9212rates.FRLRP1
@@ -179,7 +163,6 @@ k_matrix:
   CF9212kmChlf:
     matrix:
       (CF9212freeChlf, CF9212freeChlf): CF9212rates.kFf
-#
 
 initial_concentration:
   CF9212inputFRL:
@@ -192,6 +175,9 @@ initial_concentration:
     exclude_from_normalize: [CF9212freeChla]
 
 clp_penalties:
+# specify that the penalty aims to minimize
+# the difference between the areas of the SAS of
+# CF9212Red2 minus area.Bulk*CF9212Bulk
   - type: equal_area
     source: CF9212Red2
     source_intervals: [[0, 1000]]
@@ -241,68 +227,8 @@ clp_penalties:
     target_intervals: [[0, 1000]]
     parameter: area.1
     weight: 5.62e-2
-        #
-
-# clp_relations:
-  # - source: freeChlf
-  #   target: CF9212freeChlf
-  #   parameter: rel.r1
-  #   interval: [[0, 1000]]
-  # - source: sWLRC
-  #   target: CF9212WLRC
-  #   parameter: rel.r1
-  #   interval: [[0, 1000]]
-  # - source: sFRLRC
-  #   target: CF9212FRLRC
-  #   parameter: rel.r1
-  #   interval: [[0, 1000]]
-  # - source: sRed2
-  #   target: CF9212Red2
-  #   parameter: rel.r1
-  #   interval: [[0, 1000]]
-  # - source: sChlf2
-  #   target: CF9212Chlf2
-  #   parameter: rel.r1
-  #   interval: [[0, 800]]
 
 clp_constraints:
-  # - type: zero
-  #   target: sRed2
-  #   interval:
-  #     - [100, 683]
-  # - type: zero
-  #   target: sWLRC
-  #   interval:
-  #     - [100, 658]
-  # - type: zero
-  #   target: sWLRP1
-  #   interval:
-  #     - [100, 1000]
-  # - type: zero
-  #   target: sFRLRC
-  #   interval:
-  #     - [100, 702]
-  # - type: zero
-  #   target: sFRLRP1
-  #   interval:
-  #     - [100, 1000]
-  # - type: zero
-  #   target: sChlf1
-  #   interval:
-  #     - [100, 700]
-  # - type: zero
-  #   target: freeChlf
-  #   interval:
-  #     - [100, 700]
-  # - type: zero
-  #   target: sChlf2
-  #   interval:
-  #     - [100, 720]
-      #
-  # - type: zero
-  #   target: CF9212Red2
-  #   interval:
-  #     - [100, 683]
   - type: zero
     target: CF9212WLRC
     interval:
@@ -323,10 +249,6 @@ clp_constraints:
     target: CF9212FRLRP2
     interval:
       - [100, 1000]
-  # - type: zero
-  #   target: CF9212FRLRC
-  #   interval:
-  #     - [100, 702]
   - type: zero
     target: CF9212Chlf1
     interval:
@@ -339,7 +261,6 @@ clp_constraints:
     target: CF9212Chlf2
     interval:
       - [100, 720]
-      #
 
 # it is implicitly normalized, i.e. divided by sum of irfscale parameters
 irf:
@@ -405,28 +326,12 @@ weights:
   - datasets: [Red1SAS]
     global_interval: [100, 1000]
     value: 2.e-1
-    # value: 3.e-2
   - datasets: [Red2SAS]
     global_interval: [100, 1000]
     value: 2.e-1
   - datasets: [WLRCSAS]
     global_interval: [100, 1000]
     value: 6.e-1
-  # - datasets: [Chlf1SAS]
-  #   global_interval: [100, 1000]
-  #   value: 3.e-1
-  # - datasets: [Chlf2SAS]
-  #   global_interval: [100, 1000]
-  #   value: 3.e-1
   - datasets: [FRLRCSAS]
     global_interval: [100, 1000]
     value: 6.e-2
-  # - datasets: [freeChlfSAS]
-  #   global_interval: [100, 1000]
-  #   value: 3.e-3
-  # - datasets: [CF9212FRLtr1,CF9212FRLtr2,CF9212FRLtr4,CF9212WLtr1,CF9212WLtr2]
-  #   global_interval: [100, 1000]
-  #   value: 0.5
-  # - datasets: [CF9212WLtr4]
-  #   global_interval: [100, 1000]
-  #   value: 0.1

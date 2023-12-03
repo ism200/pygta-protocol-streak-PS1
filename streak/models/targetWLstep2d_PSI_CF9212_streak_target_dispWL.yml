@@ -8,7 +8,7 @@ dataset:
   CF9212WLtr1:
     group: streak
     megacomplex: [CF9212complexWL,CF9212freeChla]
-# the 2nd megacomplex_scale parameter differs to allow for free Chla fractions per data set     
+# the 2nd megacomplex_scale parameter differs to allow for free Chla fractions per data set
     megacomplex_scale: [CF9212scalem.1,CF9212scalem.WLtr1a]
     initial_concentration: CF9212inputWL
     irf: CF9212irfWLtr1
@@ -45,8 +45,8 @@ megacomplex:
     dimension: time
     target: CF9212WLRC
     type: clp-guide
-# here all the microscopic rate constants of the kinetic scheme 
-# (which is based upon the high time resolution TA data) 
+# here all the microscopic rate constants of the kinetic scheme
+# (which is based upon the high time resolution TA data)
 # for WL-PSI are specified
 k_matrix:
   CF9212skmBulkWL:
@@ -113,7 +113,6 @@ clp_constraints:
     target: CF9212WLRP1
     interval:
       - [100, 1000]
-      #
 
 # it is implicitly normalized, i.e. divided by sum of irfscale parameters
 irf:

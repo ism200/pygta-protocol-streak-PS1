@@ -61,6 +61,9 @@ clp_penalties:
     target_intervals: [[0, 1000]]
     parameter: area.1
     weight: 0.62e-2
+# specify that the penalty aims to minimize
+# the difference between the areas of the SAS of
+# CF9212Red1 minus area.Bulk*CF9212Bulk
   - type: equal_area
     source: CF9212Red1
     source_intervals: [[0, 1000]]

@@ -1,0 +1,13 @@
+👋 Welcome to this pyglotaran protocol codespace!
+
+⌛ Please wait until the Pyhon And Jupyter extensions have finished loading. ⌛
+
+🔍 To the left you will see a folder `streak` with the notebooks you will need.
+
+ℹ️  For more information about pyglotaran, see: https://github.com/glotaran/pyglotaran
+
+⭐⭐ =================================  IMPORTANT!!  ================================== ⭐⭐
+
+   ⌛ Please wait a minute until the environment has fully loaded, before opening notebooks!
+
+⭐⭐ ================================================================================== ⭐⭐

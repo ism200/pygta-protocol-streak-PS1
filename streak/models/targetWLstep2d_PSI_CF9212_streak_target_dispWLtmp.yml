@@ -27,28 +27,55 @@ dataset:
     initial_concentration: CF9212inputWL
     irf: CF9212irfWLtr4
     scale: CF9212scale.WLtr4
+# the guidance dataset for WLRC
+  WLRCSAS:
+    group: streak
+    megacomplex:
+    - smc4
+    scale: scale.WLRCSAS
+
+
 
 megacomplex:
   CF9212freeChla:
     k_matrix: [CF9212kmChla]
   CF9212complexWL:
     k_matrix: [CF9212skmBulkWL]
+  smc4:
+    dimension: time
+    target: CF9212WLRC
+    type: clp-guide
 # here all the microscopic rate constants of the kinetic scheme
+# (which is based upon the high time resolution TA data)
 # for WL-PSI are specified
 k_matrix:
   CF9212skmBulkWL:
     matrix:
+      (CF9212Bulk, CF9212Red1): CF9212rates.ToBulkFromRed1
+      (CF9212Red1, CF9212Bulk): CF9212rates.ToRed1FromBulk
+      (CF9212Bulk, CF9212Red2): CF9212rates.ToBulkFromRed2
+      (CF9212Red2, CF9212Bulk): CF9212rates.ToRed2FromBulk
+      (CF9212Red1, CF9212Red1): CF9212rates.kF
+      (CF9212Red2, CF9212Red2): CF9212rates.kF
+      (CF9212WLRC, CF9212WLRP1): CF9212rates.ToWLRCFromWLRP1
+      (CF9212WLRP1, CF9212WLRC): CF9212rates.ToWLRP1FromWLRC
+      (CF9212Bulk, CF9212WLRC): CF9212rates.ToBulkFromWLRC
+      (CF9212WLRC, CF9212Bulk): CF9212rates.ToWLRCFromBulk
+      (CF9212WLRP1, CF9212WLRP1): CF9212rates.WLRP1
       (CF9212Bulk, CF9212Bulk): CF9212rates.kF
-      (CF9212WLRP1, CF9212Bulk): CF9212rates.WLRP1
   CF9212kmChla:
     matrix:
       (CF9212freeChla, CF9212freeChla): CF9212rates.kF
 
 initial_concentration:
   CF9212inputWL:
-    compartments: [CF9212Bulk,CF9212freeChla,CF9212WLRP1]
-    parameters: [input.Bulk,input.1,input.0]
+    compartments: [CF9212Bulk,CF9212Red1,CF9212Red2,CF9212WLRC,CF9212freeChla,CF9212WLRP1]
+    parameters: [input.Bulk,input.Red1, input.Red2, input.RC,input.1,input.0]
     exclude_from_normalize: [CF9212freeChla]
+# to display a K-matrix without free Chla compartment a dummy initial_concentration["CF9212inputWL0"] without free Chla is used.
+  CF9212inputWL0:
+    compartments: [CF9212Bulk,CF9212Red1,CF9212Red2,CF9212WLRC,CF9212WLRP1]
+    parameters: [input.Bulk,input.Red1, input.Red2, input.RC,input.0]
 
 clp_penalties:
   - type: equal_area
@@ -58,8 +85,34 @@ clp_penalties:
     target_intervals: [[0, 1000]]
     parameter: area.1
     weight: 0.62e-2
+  - type: equal_area
+    source: CF9212Red2
+    source_intervals: [[0, 1000]]
+    target: CF9212Bulk
+    target_intervals: [[0, 1000]]
+    parameter: area.Bulk
+    weight: 0.62e-2
+  - type: equal_area
+    source: CF9212Red2
+    source_intervals: [[0, 1000]]
+    target: CF9212Red1
+    target_intervals: [[0, 1000]]
+    parameter: area.1
+    weight: 0.62e-2
+  - type: equal_area
+    source: CF9212Red2
+    source_intervals: [[0, 1000]]
+    target: CF9212WLRC
+    target_intervals: [[0, 1000]]
+    parameter: area.1
+    weight: 0.62e-2
 
 clp_constraints:
+# if needed a zero constraint can be used for Red Chla
+  # - type: zero
+  #   target: CF9212Red2
+  #   interval:
+  #     - [100, 683]
   - type: zero
     target: CF9212WLRP1
     interval:
@@ -94,3 +147,8 @@ irf:
     backsweep_period: irf.common_backsweep
     dispersion_center: irf.dispcenter
     center_dispersion_coefficients: [irf.disp1,irf.disp2]
+
+weights:
+  - datasets: [WLRCSAS]
+    global_interval: [100, 1000]
+    value: 0.1

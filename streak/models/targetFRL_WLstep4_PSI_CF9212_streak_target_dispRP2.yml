@@ -1,3 +1,4 @@
+# the prefix CF9212 is retained everywhere to enable the simultaneous target analysis of multiple strains performed in the iscience paper
 default_megacomplex: decay
 dataset_groups:
   streak:
